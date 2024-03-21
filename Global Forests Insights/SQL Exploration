@@ -1,0 +1,106 @@
+---- Percentge Change of Forest Areas by decades/year
+-- 1990 - 2000
+SELECT [Country and Area], ROUND(([Forest Area, 2000] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as PercentageChange90to00
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2000 - 2010
+SELECT [Country and Area], ROUND(([Forest Area, 2010] - [Forest Area, 2000]) / NULLIF([Forest Area, 2000], 0), 4) * 100 as PercentageChange00to10
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2010 - 2015
+SELECT [Country and Area], ROUND(([Forest Area, 2015] - [Forest Area, 2010]) / NULLIF([Forest Area, 2010], 0), 4) * 100 as PercentageChange10to15
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2015 - 2020
+SELECT [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+
+
+
+
+---- Total Percentage Change from 1990 - 2020
+SELECT [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as TotalPercentageChange
+FROM GlobalForestInsights..Forest_Area$
+
+
+
+
+---- Percentage of forest to total land area by decade/year
+-- 1990
+SELECT [Country and Area], ROUND([Forest Area, 1990] / NULLIF([Total Land Area, 2020], 0), 4) * 100 as ForesttoLand1990
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2000
+SELECT [Country and Area], ROUND([Forest Area, 2000] / NULLIF([Total Land Area, 2020], 0), 4) * 100 as ForesttoLand2000
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2010
+SELECT [Country and Area], ROUND([Forest Area, 2010] / NULLIF([Total Land Area, 2020], 0), 4) * 100 as ForesttoLand2010
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2015
+SELECT [Country and Area], ROUND([Forest Area, 2015] / NULLIF([Total Land Area, 2020], 0), 4) * 100 as ForesttoLand2015
+FROM GlobalForestInsights..Forest_Area$
+
+-- 2020
+SELECT [Country and Area], ROUND([Forest Area, 2020] / NULLIF([Total Land Area, 2020], 0), 4) * 100 as ForesttoLand2020
+FROM GlobalForestInsights..Forest_Area$
+
+
+
+
+---- 2015 fires and its effect on forest coverage / Potential correlation between fire and percentage change of forest area from 2015-2020
+SELECT [Country and Area], [Total Forest Area Affected by Fire, 2015], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+
+
+---- Top 10 Positive Forest Area Percentage Change
+-- 1990 - 2000
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2000] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as PercentageChange90to00
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange90to00 DESC
+
+-- 2000 - 2010
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2010] - [Forest Area, 2000]) / NULLIF([Forest Area, 2000], 0), 4) * 100 as PercentageChange00to10
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange00to10 DESC
+
+-- 2010 - 2015
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2015] - [Forest Area, 2010]) / NULLIF([Forest Area, 2010], 0), 4) * 100 as PercentageChange10to15
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange10to15 DESC
+
+-- 2015 - 2020
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange15to20 DESC
+
+
+---- Top 10 Negative Forest Area Percentage Change
+-- 1990 - 2000
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2000] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as PercentageChange90to00
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 1990] > 0
+ORDER BY PercentageChange90to00
+
+-- 2000 - 2010
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2010] - [Forest Area, 2000]) / NULLIF([Forest Area, 2000], 0), 4) * 100 as PercentageChange00to10
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2000] > 0
+ORDER BY PercentageChange00to10 
+
+-- 2010 - 2015
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2015] - [Forest Area, 2010]) / NULLIF([Forest Area, 2010], 0), 4) * 100 as PercentageChange10to15
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2010] > 0
+ORDER BY PercentageChange10to15
+
+-- 2015 - 2020
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2015] > 0
+ORDER BY PercentageChange15to20
