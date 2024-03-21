@@ -1,0 +1,339 @@
+import pypyodbc as odbc
+import matplotlib.pyplot as plt
+
+# Variables for Connecting to Driver, Server, and Database
+DRIVER_NAME = 'Driver Name'
+SERVER_NAME = 'Server Name'
+DATABASE_NAME = 'Database Name'
+
+# String to connect to SQL Database
+connection_string = f"""
+    DRIVER={{{DRIVER_NAME}}};
+    SERVER={SERVER_NAME};
+    DATABASE={DATABASE_NAME};
+    Trust_Connection=yes;
+"""
+
+# Establish Connection
+conn = odbc.connect(connection_string)
+print(conn)
+
+#### Top 10 Positive Forest Area Percentage Change
+# 1990 - 2000
+pos_chg1 = """
+-- 1990 - 2000
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2000] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as PercentageChange90to00
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange90to00 DESC
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(pos_chg1)
+pos_chg_data1 = cursor.fetchall()
+
+# 2000 - 2010
+pos_chg2 = """
+-- 2000 - 2010
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2010] - [Forest Area, 2000]) / NULLIF([Forest Area, 2000], 0), 4) * 100 as PercentageChange00to10
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange00to10 DESC
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(pos_chg2)
+pos_chg_data2 = cursor.fetchall()
+
+
+# 2010 - 2015
+pos_chg3 = """
+-- 2010 - 2015
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2015] - [Forest Area, 2010]) / NULLIF([Forest Area, 2010], 0), 4) * 100 as PercentageChange10to15
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange10to15 DESC
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(pos_chg3)
+pos_chg_data3 = cursor.fetchall()
+
+
+# 2015 - 2020
+pos_chg4 = """
+-- 2015 - 2020
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD'
+ORDER BY PercentageChange15to20 DESC
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(pos_chg4)
+pos_chg_data4 = cursor.fetchall()
+
+
+#### Top 10 Negative Forest Area Percentage Change
+# 1990 - 2000
+neg_chg1 = """
+-- 1990 - 2000
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2000] - [Forest Area, 1990]) / NULLIF([Forest Area, 1990], 0), 4) * 100 as PercentageChange90to00
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 1990] > 0
+ORDER BY PercentageChange90to00
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(neg_chg1)
+neg_chg_data1 = cursor.fetchall()
+
+
+# 2000 - 2010
+neg_chg2 = """
+-- 2000 - 2010
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2010] - [Forest Area, 2000]) / NULLIF([Forest Area, 2000], 0), 4) * 100 as PercentageChange00to10
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2000] > 0
+ORDER BY PercentageChange00to10 
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(neg_chg2)
+neg_chg_data2 = cursor.fetchall()
+
+
+# 2010 - 2015
+neg_chg3 = """
+-- 2010 - 2015
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2015] - [Forest Area, 2010]) / NULLIF([Forest Area, 2010], 0), 4) * 100 as PercentageChange10to15
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2010] > 0
+ORDER BY PercentageChange10to15
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(neg_chg3)
+neg_chg_data3 = cursor.fetchall()
+
+
+# 2015 - 2020
+neg_chg4 = """
+-- 2015 - 2020
+SELECT TOP 10 [Country and Area], ROUND(([Forest Area, 2020] - [Forest Area, 2015]) / NULLIF([Forest Area, 2015], 0), 4) * 100 as PercentageChange15to20
+FROM GlobalForestInsights..Forest_Area$
+WHERE [Country and Area] != 'WORLD' and [Forest Area, 2015] > 0
+ORDER BY PercentageChange15to20
+"""
+
+# Execute the query and load data into a numpy array
+cursor = conn.cursor()
+cursor.execute(neg_chg4)
+neg_chg_data4 = cursor.fetchall()
+
+
+# Close the connection
+conn.close()
+
+
+
+
+
+
+#### Converting data to tables - Top 10 Positives
+
+# Display the first few rows of the data array to verify the data
+print(pos_chg_data1[:5])
+
+# Extract categories and values from pct_chg_data1
+categories = [entry[0] for entry in pos_chg_data1][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in pos_chg_data1][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for pct_chg_data1
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Positive Change (1990 - 2000)')
+plt.xticks(rotation=25, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# Display the first few rows of the data array to verify the data
+print(pos_chg_data2[:5])
+
+# Extract categories and values from pos_chg_data2
+categories = [entry[0] for entry in pos_chg_data2][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in pos_chg_data2][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for pos_chg_data2
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Positive Change (2000 - 2010)')
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# Display the first few rows of the data array to verify the data
+print(pos_chg_data3[:5])
+
+# Extract categories and values from pos_chg_data3
+categories = [entry[0] for entry in pos_chg_data3][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in pos_chg_data3][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for pct_chg_array3
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Positive Change (2010 - 2015)')
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# Display the first few rows of the data array to verify the data
+print(pos_chg_data4[:5])
+
+# Extract categories and values from pos_chg_data4
+categories = [entry[0] for entry in pos_chg_data4][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in pos_chg_data4][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for pos_chg_data4
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Positive Change (2015 - 2020)')
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+
+
+#### Converting data to tables - Top 10 Negatives
+
+# Display the first few rows of the data array to verify the data
+print(neg_chg_data1[:5])
+
+# Extract categories and values from neg_chg_data1
+categories = [entry[0] for entry in neg_chg_data1][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in neg_chg_data1][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for neg_chg_data1
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Negative Change (1990 - 2000)')
+plt.xticks(rotation=25, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# Display the first few rows of the data array to verify the data
+print(neg_chg_data2[:5])
+
+# Extract categories and values from neg_chg_data2
+categories = [entry[0] for entry in neg_chg_data2][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in neg_chg_data2][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for neg_chg_data2
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Negative Change (2000 - 2010)')
+plt.xticks(rotation=25, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# neg_chg_data3
+# Display the first few rows of the data array to verify the data
+print(neg_chg_data3[:5])
+
+# Extract categories and values from neg_chg_data3
+categories = [entry[0] for entry in neg_chg_data3][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in neg_chg_data3][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for neg_chg_data3
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Negative Change (2010 - 2015)')
+plt.xticks(rotation=25, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
+
+
+# neg_chg_data4
+# Display the first few rows of the data array to verify the data
+print(neg_chg_data4[:5])
+
+# Extract categories and values from neg_chg_data4
+categories = [entry[0] for entry in neg_chg_data4][::1]  # Country names stored in the first column of each tuple
+values = [entry[1] for entry in neg_chg_data4][::1]  # Percentage change values stored in the second column of each tuple
+
+# Create a horizontal bar chart for neg_chg_data4
+plt.figure(figsize=(12, 8))
+bars = plt.bar(categories, values)
+# Add exact values on the left side of the bars
+for bar, value in zip(bars, values):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{value:.2f}', ha='center', va='bottom', fontsize=7)
+plt.yticks(fontsize=7)
+plt.xlabel('Country/Region')
+plt.ylabel('Forest Area Percentage Change')
+plt.title('Top 10 Negative Change (2015 - 2020)')
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y')  # Add gridlines only to the y-axis
+plt.tight_layout()
+plt.show()
